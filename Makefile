@@ -12,12 +12,15 @@ build:
 	@chmod a+x ./bin/extractor
 
 build-container:
-	@export GIT_COMMIT=$$(git rev-list -1 HEAD); export BUILD_TIME=$$(date -u +'%Y-%m-%dT%H:%M:%SZ'); export VERSION=1.0.0; \
+	@export GIT_COMMIT=$$(git rev-list -1 HEAD); export BUILD_TIME=$$(date -u +'%Y-%m-%dT%H:%M:%SZ'); export VERSION=local; \
 	docker build \
 				--build-arg GIT_COMMIT=$$GIT_COMMIT \
 				--build-arg BUILD_TIME=$$BUILD_TIME \
 				--build-arg VERSION=$$VERSION \
 				-t "mongodb-extractor:test" .
+
+print-container-version:
+	docker run --rm "mongodb-extractor:test"
 
 run-ping: build
 	@./bin/extractor ping --conn-uri "$(MONGO_CONN_URI)" --db-name "$(MONGO_DBNAME)" --app-name "$(APPNAME)"
