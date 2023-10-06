@@ -1,0 +1,36 @@
+name: Docker Image CI
+on:
+  push:
+    tags: [ '**' ]
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - id: checkout
+      name: Checkout code
+      uses: actions/checkout@v3
+      
+    - id: build
+      name: Build image
+      run: |
+        export VERSION=$(echo "${{ github.ref }}" | sed 's/^refs\/tags\///')
+        export COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+        export BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        docker build \
+          --build-arg GIT_COMMIT=$COMMIT_HASH \
+          --build-arg BUILD_TIME=$BUILD_TIME \
+          --build-arg VERSION=$VERSION \
+          -t "victorfaro/mongoextract:$VERSION-alpine" .
+        echo "tag=$VERSION" >> $GITHUB_OUTPUT
+
+    - id: login
+      name: Login to Docker Hub
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+    - id: push
+      name: Push Docker image
+      run: docker push "victorfaro/mongoextract:${{ steps.build.outputs.tag }}-alpine"
