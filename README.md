@@ -58,3 +58,18 @@ mongoextract extract \
 	--mapping some_mapping_name \
 	--query '{"latitude":{"$$gte":30}}'
 ```
+
+
+## Releases
+All releases are documented in [CHANGELOG](CHANGELOG.md), please check there for more details.
+
+
+### Docker
+All releases are containerized and available [here](https://hub.docker.com/r/victorfaro/mongoextract)
+To pull the latest version, execute the following command:
+
+```bash
+docker pull victorfaro/mongoextract:latest
+```
+
+All images uses the cli as entrypoint, check the above examples to see how to use it.
